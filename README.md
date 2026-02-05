@@ -150,4 +150,3 @@ export = Products;
 ## License
 
 MIT
-# spearmint
