@@ -23,7 +23,6 @@ pub type Mapping = HashMap<String, MappingEntry>;
 
 #[derive(Debug)]
 pub struct SyncResult {
-    pub key: String,
     pub action: String,
     pub error: Option<String>,
 }
@@ -68,7 +67,6 @@ pub async fn sync_all_products(
             Ok(action) => {
                 println!("[{}] {} - {}", action, product.product_type, key);
                 results.push(SyncResult {
-                    key: key.clone(),
                     action,
                     error: None,
                 });
@@ -76,7 +74,6 @@ pub async fn sync_all_products(
             Err(e) => {
                 println!("[ERROR] {} - {}: {}", product.product_type, key, e);
                 results.push(SyncResult {
-                    key: key.clone(),
                     action: "error".to_string(),
                     error: Some(e.to_string()),
                 });
