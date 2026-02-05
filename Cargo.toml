@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2021"
 description = "CLI tool to sync developer products and gamepasses to Roblox"
 license = "MIT"
-repository = "https://github.com/samcparker/spearmint"
+repository = "https://github.com/UrbanIndigo/spearmint"
 
 [dependencies]
 clap = { version = "4", features = ["derive"] }
