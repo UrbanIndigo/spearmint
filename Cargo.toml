@@ -1,10 +1,11 @@
 [package]
 name = "spearmint"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 description = "CLI tool to sync developer products and gamepasses to Roblox"
 license = "MIT"
 repository = "https://github.com/UrbanIndigo/spearmint"
+homepage = "https://github.com/UrbanIndigo/spearmint"
 
 [dependencies]
 clap = { version = "4", features = ["derive"] }
@@ -22,3 +23,8 @@ hex = "0.4"
 lto = true
 strip = true
 opt-level = "z"
+
+# The profile that 'dist' will build with
+[profile.dist]
+inherits = "release"
+lto = "thin"
