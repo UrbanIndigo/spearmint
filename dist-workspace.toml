@@ -26,6 +26,6 @@ pr-run-mode = "plan"
 # Whether to install an updater program
 install-updater = false
 # Use zip format for Aftman/Foreman compatibility
-package-format = "zip"
+unix-archive = ".zip"
 # Skip regeneration checks for CI files we manage ourselves
 allow-dirty = ["ci"]
