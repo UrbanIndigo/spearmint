@@ -19,7 +19,10 @@ pub fn write_output(config: &Config, mapping: &Mapping) -> Result<()> {
     println!("Generated Lua output: {}", output.path);
 
     if output.typescript {
-        let dts_path = output.path.replace(".luau", ".d.ts").replace(".lua", ".d.ts");
+        let dts_path = output
+            .path
+            .replace(".luau", ".d.ts")
+            .replace(".lua", ".d.ts");
         let dts_content = generate_dts(config, mapping);
         write_file(&dts_path, &dts_content)?;
         println!("Generated TypeScript definitions: {}", dts_path);

@@ -1,6 +1,6 @@
 use anyhow::{Context, Result};
 use serde::{Deserialize, Serialize};
-use sha2::{Sha256, Digest};
+use sha2::{Digest, Sha256};
 use std::collections::HashMap;
 use std::fs;
 use std::path::Path;
@@ -91,7 +91,9 @@ async fn sync_product(
     product: &Product,
     mapping: &mut Mapping,
 ) -> Result<String> {
-    let existing_id = product.product_id.or_else(|| mapping.get(key).map(|m| m.roblox_id));
+    let existing_id = product
+        .product_id
+        .or_else(|| mapping.get(key).map(|m| m.roblox_id));
 
     match product.product_type {
         ProductType::DevProduct => {

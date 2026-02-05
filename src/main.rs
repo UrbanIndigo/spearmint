@@ -1,8 +1,8 @@
-mod cli;
-mod config;
 mod api;
-mod sync;
+mod cli;
 mod codegen;
+mod config;
+mod sync;
 
 use anyhow::Result;
 use clap::Parser;
@@ -16,12 +16,12 @@ async fn main() -> Result<()> {
 
     match cli.command {
         Commands::Init { force } => cli::init(force)?,
-        Commands::Sync { config, mapping, generate } => {
-            cli::sync(config, mapping, generate).await?
-        }
-        Commands::Generate { config, mapping } => {
-            cli::generate(config, mapping)?
-        }
+        Commands::Sync {
+            config,
+            mapping,
+            generate,
+        } => cli::sync(config, mapping, generate).await?,
+        Commands::Generate { config, mapping } => cli::generate(config, mapping)?,
         Commands::List { config, mapping } => cli::list(config, mapping)?,
     }
 

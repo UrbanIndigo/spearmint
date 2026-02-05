@@ -2,10 +2,10 @@ use anyhow::Result;
 use clap::{Parser, Subcommand};
 use std::path::Path;
 
+use crate::api::Client;
+use crate::codegen;
 use crate::config::{self, DEFAULT_CONFIG_PATH};
 use crate::sync::{self, DEFAULT_MAPPING_PATH};
-use crate::codegen;
-use crate::api::Client;
 
 #[derive(Parser)]
 #[command(name = "spearmint")]
@@ -78,11 +78,7 @@ pub fn init(force: bool) -> Result<()> {
     Ok(())
 }
 
-pub async fn sync(
-    config_path: String,
-    mapping_path: String,
-    generate: bool,
-) -> Result<()> {
+pub async fn sync(config_path: String, mapping_path: String, generate: bool) -> Result<()> {
     let config = config::load(&config_path)?;
     let mut mapping = sync::load_mapping(&mapping_path)?;
     let client = Client::new()?;
@@ -100,10 +96,16 @@ pub async fn sync(
 
     let created = results.iter().filter(|r| r.action == "created").count();
     let updated = results.iter().filter(|r| r.action == "updated").count();
-    let skipped = results.iter().filter(|r| r.action == "skipped" && r.error.is_none()).count();
+    let skipped = results
+        .iter()
+        .filter(|r| r.action == "skipped" && r.error.is_none())
+        .count();
     let failed = results.iter().filter(|r| r.error.is_some()).count();
 
-    println!("\nSummary: {} created, {} updated, {} unchanged, {} failed", created, updated, skipped, failed);
+    println!(
+        "\nSummary: {} created, {} updated, {} unchanged, {} failed",
+        created, updated, skipped, failed
+    );
 
     if failed > 0 {
         std::process::exit(1);
@@ -112,10 +114,7 @@ pub async fn sync(
     Ok(())
 }
 
-pub fn generate(
-    config_path: String,
-    mapping_path: String,
-) -> Result<()> {
+pub fn generate(config_path: String, mapping_path: String) -> Result<()> {
     let config = config::load(&config_path)?;
     let mapping = sync::load_mapping(&mapping_path)?;
 
