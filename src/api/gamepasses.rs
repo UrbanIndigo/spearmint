@@ -1,6 +1,7 @@
 use anyhow::{Context, Result};
-use reqwest::multipart::Form;
+use reqwest::multipart::{Form, Part};
 use serde::Deserialize;
+use std::fs;
 
 use super::Client;
 
@@ -15,6 +16,7 @@ pub struct UpdateGamepassRequest {
     pub name: Option<String>,
     pub price: Option<u64>,
     pub description: Option<String>,
+    pub icon_path: Option<String>,
 }
 
 impl Client {
@@ -24,6 +26,7 @@ impl Client {
         name: String,
         price: u64,
         description: Option<String>,
+        icon_path: Option<String>,
     ) -> Result<GamepassResponse> {
         let url = format!(
             "https://apis.roblox.com/game-passes/v1/universes/{}/game-passes",
@@ -36,6 +39,15 @@ impl Client {
 
         if let Some(desc) = description {
             form = form.text("description", desc);
+        }
+
+        if let Some(icon_path) = icon_path {
+            let icon_bytes = fs::read(&icon_path)
+                .with_context(|| format!("Failed to read icon file: {}", icon_path))?;
+            let icon_part = Part::bytes(icon_bytes)
+                .file_name("icon.png")
+                .mime_str("image/png")?;
+            form = form.part("iconImageFile", icon_part);
         }
 
         let response = self
@@ -79,6 +91,15 @@ impl Client {
         }
         if let Some(desc) = request.description {
             form = form.text("description", desc);
+        }
+
+        if let Some(icon_path) = request.icon_path {
+            let icon_bytes = fs::read(&icon_path)
+                .with_context(|| format!("Failed to read icon file: {}", icon_path))?;
+            let icon_part = Part::bytes(icon_bytes)
+                .file_name("icon.png")
+                .mime_str("image/png")?;
+            form = form.part("iconImageFile", icon_part);
         }
 
         let response = self

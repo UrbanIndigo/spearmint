@@ -146,6 +146,19 @@ async fn sync_dev_product(
                 }
             }
 
+            // Only include icon if it has changed
+            let icon_path = if let Some(ref image) = product.image {
+                let new_hash = hash_file(image);
+                let old_hash = mapping.get(key).and_then(|e| e.image_hash.clone());
+                if new_hash != old_hash {
+                    Some(image.clone())
+                } else {
+                    None
+                }
+            } else {
+                None
+            };
+
             client
                 .update_dev_product(
                     universe_id,
@@ -154,6 +167,7 @@ async fn sync_dev_product(
                         name: Some(product.name.clone()),
                         price: Some(product.price),
                         description: product.description.clone(),
+                        icon_path,
                     },
                 )
                 .await?;
@@ -177,6 +191,7 @@ async fn sync_dev_product(
                         name: product.name.clone(),
                         price: product.price,
                         description: product.description.clone(),
+                        icon_path: product.image.clone(),
                     },
                 )
                 .await?;
@@ -214,6 +229,19 @@ async fn sync_gamepass(
                 }
             }
 
+            // Only include icon if it has changed
+            let icon_path = if let Some(ref image) = product.image {
+                let new_hash = hash_file(image);
+                let old_hash = mapping.get(key).and_then(|e| e.image_hash.clone());
+                if new_hash != old_hash {
+                    Some(image.clone())
+                } else {
+                    None
+                }
+            } else {
+                None
+            };
+
             client
                 .update_gamepass(
                     universe_id,
@@ -222,6 +250,7 @@ async fn sync_gamepass(
                         name: Some(product.name.clone()),
                         price: Some(product.price),
                         description: product.description.clone(),
+                        icon_path,
                     },
                 )
                 .await?;
@@ -244,6 +273,7 @@ async fn sync_gamepass(
                     product.name.clone(),
                     product.price,
                     product.description.clone(),
+                    product.image.clone(),
                 )
                 .await?;
 
