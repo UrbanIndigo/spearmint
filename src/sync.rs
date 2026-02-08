@@ -57,11 +57,12 @@ pub async fn sync_all_products(
     client: &Client,
     config: &Config,
     mapping: &mut Mapping,
+    force: bool,
 ) -> Result<Vec<SyncResult>> {
     let mut results = Vec::new();
 
     for (key, product) in &config.products {
-        let result = sync_product(client, config.universe_id, key, product, mapping).await;
+        let result = sync_product(client, config.universe_id, key, product, mapping, force).await;
 
         match result {
             Ok(action) => {
@@ -90,6 +91,7 @@ async fn sync_product(
     key: &str,
     product: &Product,
     mapping: &mut Mapping,
+    force: bool,
 ) -> Result<String> {
     let existing_id = product
         .product_id
@@ -97,10 +99,10 @@ async fn sync_product(
 
     match product.product_type {
         ProductType::DevProduct => {
-            sync_dev_product(client, universe_id, key, product, existing_id, mapping).await
+            sync_dev_product(client, universe_id, key, product, existing_id, mapping, force).await
         }
         ProductType::Gamepass => {
-            sync_gamepass(client, universe_id, key, product, existing_id, mapping).await
+            sync_gamepass(client, universe_id, key, product, existing_id, mapping, force).await
         }
     }
 }
@@ -136,24 +138,31 @@ async fn sync_dev_product(
     product: &Product,
     existing_id: Option<u64>,
     mapping: &mut Mapping,
+    force: bool,
 ) -> Result<String> {
     match existing_id {
         Some(id) => {
-            // Check locally if the config has changed since last sync
-            if let Some(entry) = mapping.get(key) {
-                if !config_changed(product, entry) {
-                    return Ok("skipped".to_string());
+            // Check locally if the config has changed since last sync (skip if force)
+            if !force {
+                if let Some(entry) = mapping.get(key) {
+                    if !config_changed(product, entry) {
+                        return Ok("skipped".to_string());
+                    }
                 }
             }
 
-            // Only include icon if it has changed
+            // Include icon if it has changed or if force is enabled
             let icon_path = if let Some(ref image) = product.image {
-                let new_hash = hash_file(image);
-                let old_hash = mapping.get(key).and_then(|e| e.image_hash.clone());
-                if new_hash != old_hash {
+                if force {
                     Some(image.clone())
                 } else {
-                    None
+                    let new_hash = hash_file(image);
+                    let old_hash = mapping.get(key).and_then(|e| e.image_hash.clone());
+                    if new_hash != old_hash {
+                        Some(image.clone())
+                    } else {
+                        None
+                    }
                 }
             } else {
                 None
@@ -219,24 +228,31 @@ async fn sync_gamepass(
     product: &Product,
     existing_id: Option<u64>,
     mapping: &mut Mapping,
+    force: bool,
 ) -> Result<String> {
     match existing_id {
         Some(id) => {
-            // Check locally if the config has changed since last sync
-            if let Some(entry) = mapping.get(key) {
-                if !config_changed(product, entry) {
-                    return Ok("skipped".to_string());
+            // Check locally if the config has changed since last sync (skip if force)
+            if !force {
+                if let Some(entry) = mapping.get(key) {
+                    if !config_changed(product, entry) {
+                        return Ok("skipped".to_string());
+                    }
                 }
             }
 
-            // Only include icon if it has changed
+            // Include icon if it has changed or if force is enabled
             let icon_path = if let Some(ref image) = product.image {
-                let new_hash = hash_file(image);
-                let old_hash = mapping.get(key).and_then(|e| e.image_hash.clone());
-                if new_hash != old_hash {
+                if force {
                     Some(image.clone())
                 } else {
-                    None
+                    let new_hash = hash_file(image);
+                    let old_hash = mapping.get(key).and_then(|e| e.image_hash.clone());
+                    if new_hash != old_hash {
+                        Some(image.clone())
+                    } else {
+                        None
+                    }
                 }
             } else {
                 None

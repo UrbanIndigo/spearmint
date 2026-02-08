@@ -20,7 +20,8 @@ async fn main() -> Result<()> {
             config,
             mapping,
             generate,
-        } => cli::sync(config, mapping, generate).await?,
+            force,
+        } => cli::sync(config, mapping, generate, force).await?,
         Commands::Generate { config, mapping } => cli::generate(config, mapping)?,
         Commands::List { config, mapping } => cli::list(config, mapping)?,
     }

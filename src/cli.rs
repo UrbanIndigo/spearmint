@@ -35,6 +35,9 @@ pub enum Commands {
         /// Skip code generation after sync
         #[arg(long = "no-generate", action = clap::ArgAction::SetFalse)]
         generate: bool,
+        /// Force re-sync all products, ignoring lock file
+        #[arg(short, long)]
+        force: bool,
     },
     /// Generate Lua and TypeScript output without syncing
     Generate {
@@ -78,14 +81,17 @@ pub fn init(force: bool) -> Result<()> {
     Ok(())
 }
 
-pub async fn sync(config_path: String, mapping_path: String, generate: bool) -> Result<()> {
+pub async fn sync(config_path: String, mapping_path: String, generate: bool, force: bool) -> Result<()> {
     let config = config::load(&config_path)?;
     let mut mapping = sync::load_mapping(&mapping_path)?;
     let client = Client::new()?;
 
+    if force {
+        println!("Force sync enabled - re-syncing all products...\n");
+    }
     println!("Syncing products for universe {}...\n", config.universe_id);
 
-    let results = sync::sync_all_products(&client, &config, &mut mapping).await?;
+    let results = sync::sync_all_products(&client, &config, &mut mapping, force).await?;
 
     sync::save_mapping(&mapping, &mapping_path)?;
     println!("\nMapping saved to: {}", mapping_path);
