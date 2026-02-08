@@ -99,10 +99,28 @@ async fn sync_product(
 
     match product.product_type {
         ProductType::DevProduct => {
-            sync_dev_product(client, universe_id, key, product, existing_id, mapping, force).await
+            sync_dev_product(
+                client,
+                universe_id,
+                key,
+                product,
+                existing_id,
+                mapping,
+                force,
+            )
+            .await
         }
         ProductType::Gamepass => {
-            sync_gamepass(client, universe_id, key, product, existing_id, mapping, force).await
+            sync_gamepass(
+                client,
+                universe_id,
+                key,
+                product,
+                existing_id,
+                mapping,
+                force,
+            )
+            .await
         }
     }
 }

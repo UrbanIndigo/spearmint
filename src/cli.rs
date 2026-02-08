@@ -81,7 +81,12 @@ pub fn init(force: bool) -> Result<()> {
     Ok(())
 }
 
-pub async fn sync(config_path: String, mapping_path: String, generate: bool, force: bool) -> Result<()> {
+pub async fn sync(
+    config_path: String,
+    mapping_path: String,
+    generate: bool,
+    force: bool,
+) -> Result<()> {
     let config = config::load(&config_path)?;
     let mut mapping = sync::load_mapping(&mapping_path)?;
     let client = Client::new()?;
