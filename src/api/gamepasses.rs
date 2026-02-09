@@ -19,6 +19,7 @@ pub struct UpdateGamepassRequest {
     pub price: Option<u64>,
     pub description: Option<String>,
     pub icon_path: Option<String>,
+    pub is_for_sale: Option<bool>,
 }
 
 fn build_create_form(
@@ -26,10 +27,12 @@ fn build_create_form(
     price: u64,
     description: &Option<String>,
     icon_path: &Option<String>,
+    is_for_sale: bool,
 ) -> Result<Form> {
     let mut form = Form::new()
         .text("name", name.to_string())
-        .text("price", price.to_string());
+        .text("price", price.to_string())
+        .text("isForSale", is_for_sale.to_string());
 
     if let Some(ref desc) = description {
         form = form.text("description", desc.clone());
@@ -61,6 +64,9 @@ fn build_update_form(request: &UpdateGamepassRequest) -> Result<Form> {
     if let Some(ref desc) = request.description {
         form = form.text("description", desc.clone());
     }
+    if let Some(is_for_sale) = request.is_for_sale {
+        form = form.text("isForSale", is_for_sale.to_string());
+    }
 
     if let Some(ref icon_path) = request.icon_path {
         let icon_bytes = fs::read(icon_path)
@@ -84,6 +90,7 @@ impl Client {
         price: u64,
         description: Option<String>,
         icon_path: Option<String>,
+        is_for_sale: bool,
     ) -> Result<GamepassResponse> {
         let url = format!(
             "https://apis.roblox.com/game-passes/v1/universes/{}/game-passes",
@@ -92,7 +99,7 @@ impl Client {
 
         let mut retries = 0;
         loop {
-            let form = build_create_form(&name, price, &description, &icon_path)?;
+            let form = build_create_form(&name, price, &description, &icon_path, is_for_sale)?;
 
             let response = self
                 .http()

@@ -29,6 +29,10 @@ pub struct Product {
     pub description: Option<String>,
     pub image: Option<String>,
     pub product_id: Option<u64>,
+    /// If true, the gamepass will be off sale. Defaults to false (on sale).
+    /// Only applies to gamepasses, ignored for dev products.
+    #[serde(default)]
+    pub offsale: bool,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
@@ -102,6 +106,7 @@ pub fn create_default() -> Config {
             description: Some("An example developer product".to_string()),
             image: None,
             product_id: None,
+            offsale: false,
         },
     );
 
@@ -114,6 +119,7 @@ pub fn create_default() -> Config {
             description: Some("An example gamepass".to_string()),
             image: None,
             product_id: None,
+            offsale: false,
         },
     );
 

@@ -17,6 +17,7 @@ pub struct MappingEntry {
     pub price: Option<u64>,
     pub description: Option<String>,
     pub image_hash: Option<String>,
+    pub offsale: Option<bool>,
 }
 
 pub type Mapping = HashMap<String, MappingEntry>;
@@ -140,6 +141,8 @@ fn config_changed(product: &Product, entry: &MappingEntry) -> bool {
         || entry.price != Some(product.price)
         || entry.description != product.description
         || image_hash(product) != entry.image_hash
+        || (product.product_type == ProductType::Gamepass
+            && entry.offsale != Some(product.offsale))
 }
 
 fn update_mapping_entry(entry: &mut MappingEntry, product: &Product) {
@@ -147,6 +150,9 @@ fn update_mapping_entry(entry: &mut MappingEntry, product: &Product) {
     entry.price = Some(product.price);
     entry.description = product.description.clone();
     entry.image_hash = image_hash(product);
+    if product.product_type == ProductType::Gamepass {
+        entry.offsale = Some(product.offsale);
+    }
 }
 
 async fn sync_dev_product(
@@ -205,6 +211,7 @@ async fn sync_dev_product(
                 price: None,
                 description: None,
                 image_hash: None,
+                offsale: None,
             });
             update_mapping_entry(entry, product);
 
@@ -231,6 +238,7 @@ async fn sync_dev_product(
                     price: Some(product.price),
                     description: product.description.clone(),
                     image_hash: image_hash(product),
+                    offsale: None,
                 },
             );
 
@@ -285,6 +293,7 @@ async fn sync_gamepass(
                         price: Some(product.price),
                         description: product.description.clone(),
                         icon_path,
+                        is_for_sale: Some(!product.offsale),
                     },
                 )
                 .await?;
@@ -295,6 +304,7 @@ async fn sync_gamepass(
                 price: None,
                 description: None,
                 image_hash: None,
+                offsale: None,
             });
             update_mapping_entry(entry, product);
 
@@ -308,6 +318,7 @@ async fn sync_gamepass(
                     product.price,
                     product.description.clone(),
                     product.image.clone(),
+                    !product.offsale,
                 )
                 .await?;
 
@@ -319,6 +330,7 @@ async fn sync_gamepass(
                     price: Some(product.price),
                     description: product.description.clone(),
                     image_hash: image_hash(product),
+                    offsale: Some(product.offsale),
                 },
             );
 
