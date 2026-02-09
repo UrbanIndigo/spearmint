@@ -141,8 +141,7 @@ fn config_changed(product: &Product, entry: &MappingEntry) -> bool {
         || entry.price != Some(product.price)
         || entry.description != product.description
         || image_hash(product) != entry.image_hash
-        || (product.product_type == ProductType::Gamepass
-            && entry.offsale != Some(product.offsale))
+        || (product.product_type == ProductType::Gamepass && entry.offsale != Some(product.offsale))
 }
 
 fn update_mapping_entry(entry: &mut MappingEntry, product: &Product) {
