@@ -1,6 +1,6 @@
 [package]
 name = "spearmint"
-version = "0.1.6"
+version = "0.1.7"
 edition = "2021"
 description = "CLI tool to sync developer products and gamepasses to Roblox"
 license = "MIT"
